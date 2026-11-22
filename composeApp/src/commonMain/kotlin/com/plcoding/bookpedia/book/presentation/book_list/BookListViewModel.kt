@@ -1,20 +1,17 @@
+
 @file:OptIn(FlowPreview::class)
 
 package com.plcoding.bookpedia.book.presentation.book_list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.plcoding.bookpedia.book.data.network.NetworkResponse
 import com.plcoding.bookpedia.book.domain.Book
 import com.plcoding.bookpedia.book.domain.BookRepository
-import com.plcoding.bookpedia.core.domain.onError
-import com.plcoding.bookpedia.core.domain.onSuccess
-import com.plcoding.bookpedia.core.presentation.toUiText
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
@@ -32,13 +29,13 @@ class BookListViewModel(
     private var cachedBooks = emptyList<Book>()
     private var searchJob: Job? = null
     private var observeFavoriteJob: Job? = null
+    private var observeSearchJob: Job? = null
 
     private val _state = MutableStateFlow(BookListState())
+
     val state = _state
         .onStart {
-            if(cachedBooks.isEmpty()) {
-                observeSearchQuery()
-            }
+            observeSearchQuery()
             observeFavoriteBooks()
         }
         .stateIn(
@@ -50,7 +47,7 @@ class BookListViewModel(
     fun onAction(action: BookListAction) {
         when (action) {
             is BookListAction.OnBookClick -> {
-
+                // Handle book click
             }
 
             is BookListAction.OnSearchQueryChange -> {
@@ -69,26 +66,33 @@ class BookListViewModel(
 
     private fun observeFavoriteBooks() {
         observeFavoriteJob?.cancel()
+
         observeFavoriteJob = bookRepository
             .getFavoriteBooks()
             .onEach { favoriteBooks ->
-                _state.update { it.copy(
-                    favoriteBooks = favoriteBooks
-                ) }
+                _state.update {
+                    it.copy(favoriteBooks = favoriteBooks)
+                }
             }
             .launchIn(viewModelScope)
     }
 
+    @OptIn(FlowPreview::class)
     private fun observeSearchQuery() {
-        state
+        observeSearchJob?.cancel()
+
+        observeSearchJob = _state
             .map { it.searchQuery }
             .distinctUntilChanged()
             .debounce(500L)
             .onEach { query ->
                 when {
                     query.isBlank() -> {
+                        searchJob?.cancel()
+
                         _state.update {
                             it.copy(
+                                isLoading = false,
                                 errorMessage = null,
                                 searchResults = cachedBooks
                             )
@@ -104,32 +108,43 @@ class BookListViewModel(
             .launchIn(viewModelScope)
     }
 
-    private fun searchBooks(query: String) = viewModelScope.launch {
-        _state.update {
-            it.copy(
-                isLoading = true
-            )
+    private fun searchBooks(query: String): Job {
+        return viewModelScope.launch {
+            _state.update {
+                it.copy(isLoading = true)
+            }
+
+            when (val response = bookRepository.searchBooks(query)) {
+
+                is NetworkResponse.Success -> {
+                    cachedBooks = response.data
+
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = null,
+                            searchResults = response.data
+                        )
+                    }
+                }
+
+                is NetworkResponse.Error -> {
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            searchResults = cachedBooks,
+                            errorMessage = response.message
+                        )
+                    }
+                }
+            }
         }
-        bookRepository
-            .searchBooks(query)
-            .onSuccess { searchResults ->
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = null,
-                        searchResults = searchResults
-                    )
-                }
-            }
-            .onError { error ->
-                _state.update {
-                    it.copy(
-                        searchResults = emptyList(),
-                        isLoading = false,
-                        errorMessage = error.toUiText()
-                    )
-                }
-            }
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        searchJob?.cancel()
+        observeSearchJob?.cancel()
+        observeFavoriteJob?.cancel()
+    }
 }

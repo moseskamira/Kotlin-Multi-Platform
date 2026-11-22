@@ -4,6 +4,7 @@ import androidx.sqlite.SQLiteException
 import com.plcoding.bookpedia.book.data.database.FavoriteBookDao
 import com.plcoding.bookpedia.book.data.mappers.toBook
 import com.plcoding.bookpedia.book.data.mappers.toBookEntity
+import com.plcoding.bookpedia.book.data.network.NetworkResponse
 import com.plcoding.bookpedia.book.data.network.RemoteBookDataSource
 import com.plcoding.bookpedia.book.domain.Book
 import com.plcoding.bookpedia.book.domain.BookRepository
@@ -17,24 +18,30 @@ import kotlinx.coroutines.flow.map
 class DefaultBookRepository(
     private val remoteBookDataSource: RemoteBookDataSource,
     private val favoriteBookDao: FavoriteBookDao
-): BookRepository {
-    override suspend fun searchBooks(query: String): Result<List<Book>, DataError.Remote> {
-        return remoteBookDataSource
-            .searchBooks(query)
-            .map { dto ->
-                dto.results.map { it.toBook() }
-            }
+) : BookRepository {
+
+    override suspend fun searchBooks(
+        query: String
+    ): NetworkResponse<List<Book>> {
+        return try {
+            val response = remoteBookDataSource.searchBooks(query)
+            NetworkResponse.Success(
+                response.results.map { it.toBook() }
+            )
+        } catch (e: Exception) {
+            NetworkResponse.Error(
+                e.message ?: "Something went wrong"
+            )
+        }
     }
 
-    override suspend fun getBookDescription(bookId: String): Result<String?, DataError> {
+    override suspend fun getBookDescription(bookId: String): String {
         val localResult = favoriteBookDao.getFavoriteBook(bookId)
-
-        return if(localResult == null) {
-            remoteBookDataSource
-                .getBookDetails(bookId)
-                .map { it.description }
+        return if (localResult != null) {
+            localResult.description!!
         } else {
-            Result.Success(localResult.description)
+            val remoteResult = remoteBookDataSource.getBookDetails(bookId)
+            remoteResult.description.orEmpty()
         }
     }
 
@@ -58,7 +65,7 @@ class DefaultBookRepository(
         return try {
             favoriteBookDao.upsert(book.toBookEntity())
             Result.Success(Unit)
-        } catch(e: SQLiteException) {
+        } catch (e: SQLiteException) {
             Result.Error(DataError.Local.DISK_FULL)
         }
     }

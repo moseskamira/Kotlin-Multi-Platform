@@ -71,16 +71,24 @@ class BookDetailViewModel(
 
     private fun fetchBookDescription() {
         viewModelScope.launch {
-            bookRepository
-                .getBookDescription(bookId)
-                .onSuccess { description ->
-                    _state.update { it.copy(
+            try {
+                val description = bookRepository.getBookDescription(bookId)
+
+                _state.update {
+                    it.copy(
                         book = it.book?.copy(
                             description = description
                         ),
                         isLoading = false
-                    ) }
+                    )
                 }
+            } catch (e: Exception) {
+                _state.update {
+                    it.copy(
+                        isLoading = false
+                    )
+                }
+            }
         }
     }
 }
