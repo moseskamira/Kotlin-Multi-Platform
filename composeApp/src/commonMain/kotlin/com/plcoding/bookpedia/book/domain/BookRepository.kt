@@ -3,7 +3,6 @@ package com.plcoding.bookpedia.book.domain
 import com.plcoding.bookpedia.book.data.network.NetworkResponse
 import com.plcoding.bookpedia.core.domain.DataError
 import com.plcoding.bookpedia.core.domain.EmptyResult
-import com.plcoding.bookpedia.core.domain.Result
 import kotlinx.coroutines.flow.Flow
 
 interface BookRepository {
