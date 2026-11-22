@@ -5,11 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.plcoding.bookpedia.app.Route
-import com.plcoding.bookpedia.book.domain.BookRepository
-import com.plcoding.bookpedia.core.domain.onSuccess
+import com.plcoding.bookpedia.book.domain.repositories.BookRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart

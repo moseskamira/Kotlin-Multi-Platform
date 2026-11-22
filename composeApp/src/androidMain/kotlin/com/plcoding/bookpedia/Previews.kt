@@ -7,9 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import com.plcoding.bookpedia.book.domain.Book
+import com.plcoding.bookpedia.book.domain.models.Book
 import com.plcoding.bookpedia.book.presentation.book_list.BookListScreen
-import com.plcoding.bookpedia.book.presentation.book_list.BookListState
 import com.plcoding.bookpedia.book.presentation.book_list.components.BookSearchBar
 
 @Preview
@@ -24,8 +23,7 @@ private fun BookSearchBarPreview() {
             searchQuery = "",
             onSearchQueryChange = {},
             onImeSearch = {},
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
@@ -50,9 +48,12 @@ private val books = (1..100).map {
 @Composable
 private fun BookListScreenPreview() {
     BookListScreen(
-        state = BookListState(
-            searchResults = books
-        ),
+        books = books,
+        favoriteBooks = emptyList(),
+        isLoading = false,
+        errorMessage = null,
+        searchQuery = "",
+        selectedTabIndex = 0,
         onAction = {}
     )
 }

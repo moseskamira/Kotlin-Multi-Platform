@@ -1,20 +1,22 @@
 package com.plcoding.bookpedia.book.data.network
 
 import com.plcoding.bookpedia.book.data.dto.BookWorkDto
+import com.plcoding.bookpedia.book.data.dto.CreateBookRequest
 import com.plcoding.bookpedia.book.data.dto.SearchResponseDto
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.call.body
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 
 private const val BASE_URL = "https://openlibrary.org"
 
-class KtorRemoteBookDataSource(
+class RemoteBookDataSourceImpl(
     private val httpClient: HttpClient
 ) : RemoteBookDataSource {
-
-
     override suspend fun searchBooks(
         query: String,
         resultLimit: Int?
@@ -35,5 +37,14 @@ class KtorRemoteBookDataSource(
     ): BookWorkDto {
         return httpClient.get("$BASE_URL/works/$bookWorkId.json")
             .body<BookWorkDto>()
+    }
+
+    override suspend fun createBook(
+        request: CreateBookRequest
+    ): BookWorkDto {
+        return httpClient.post("$BASE_URL/books") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
     }
 }

@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FavoriteBookDao {
-
     @Upsert
     suspend fun upsert(book: BookEntity)
 

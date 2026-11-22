@@ -1,14 +1,44 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Desktop.
+# Kotlin Multiplatform – Bookpedia
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - `commonMain` is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    `iosMain` would be the right folder for such calls.
+A Kotlin Multiplatform project built to explore and practice cross-platform application development using **Kotlin Multiplatform (KMP)**, **Compose Multiplatform**, and **Ktor Client** for REST API integration.
 
-* `/iosApp` contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform, 
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+The project targets **Android, iOS, and Desktop**, with a focus on writing reusable, maintainable, and platform-independent code while sharing business logic and UI across supported platforms.
 
+## Key Technologies & Concepts
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+- **Kotlin Multiplatform:** Sharing application logic across Android, iOS, and Desktop.
+- **Compose Multiplatform:** Building cross-platform user interfaces using a shared UI codebase.
+- **Ktor Client:** Making HTTP requests and integrating REST APIs.
+- **Kotlin Serialization:** Handling JSON serialization and deserialization.
+- **Coroutines & Flow:** Managing asynchronous operations and reactive data streams.
+- **Clean Architecture:** Separating presentation, domain, and data layers.
+- **Repository Pattern:** Managing data sources and application data operations.
+- **State Management:** Managing UI state and handling loading, success, and error states.
+
+## Project Structure
+
+### `/composeApp`
+
+Contains the shared application code for Compose Multiplatform.
+
+- `commonMain`: Shared Kotlin code used across all supported platforms, including UI, business logic, repositories, and network integration.
+- `androidMain`: Android-specific implementations.
+- `iosMain`: iOS-specific implementations and native integrations.
+- `desktopMain`: Desktop-specific implementations.
+
+### `/iosApp`
+
+Contains the native iOS application entry point. It integrates the shared Compose Multiplatform application with the iOS platform and provides a location for platform-specific SwiftUI code where needed.
+
+## Project Goals
+
+- Gain practical experience with Kotlin Multiplatform development.
+- Understand how to structure and share code across multiple platforms.
+- Practice REST API integration using Ktor Client.
+- Implement clean architecture and repository-based data management.
+- Improve understanding of Kotlin Coroutines, Flow, and asynchronous programming.
+- Explore cross-platform UI development with Compose Multiplatform.
+
+## Purpose
+
+A hands-on learning project focused on strengthening Kotlin development skills and exploring modern multiplatform application architecture.

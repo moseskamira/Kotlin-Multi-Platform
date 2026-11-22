@@ -1,7 +1,7 @@
 package com.plcoding.bookpedia.book.presentation
 
 import androidx.lifecycle.ViewModel
-import com.plcoding.bookpedia.book.domain.Book
+import com.plcoding.bookpedia.book.domain.models.Book
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
