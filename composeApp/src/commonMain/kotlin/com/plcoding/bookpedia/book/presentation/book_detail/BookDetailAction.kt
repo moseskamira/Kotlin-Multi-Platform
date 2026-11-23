@@ -1,6 +1,6 @@
 package com.plcoding.bookpedia.book.presentation.book_detail
 
-import com.plcoding.bookpedia.book.domain.Book
+import com.plcoding.bookpedia.book.domain.models.Book
 
 sealed interface BookDetailAction {
     data object OnBackClick: BookDetailAction
