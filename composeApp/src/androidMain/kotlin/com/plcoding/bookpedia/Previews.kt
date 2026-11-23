@@ -7,9 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import com.plcoding.bookpedia.book.domain.models.Book
-import com.plcoding.bookpedia.book.presentation.book_list.BookListScreen
-import com.plcoding.bookpedia.book.presentation.book_list.components.BookSearchBar
+import com.plcoding.bookpedia.features.books.domain.models.Book
+import com.plcoding.bookpedia.features.books.presentation.book_list.BookListScreen
+import com.plcoding.bookpedia.features.books.presentation.book_list.components.BookSearchBar
 
 @Preview
 @Composable
