@@ -24,11 +24,11 @@ class BookRepositoryImpl(
         return try {
             val response = remoteBookDataSource.searchBooks(query)
             AppNetworkResponse.Success(
-                response.results.map { it.toBook() }
+                response.booksDto.map { it.toBook() }
             )
         } catch (e: Exception) {
             AppNetworkResponse.Error(
-                e.message ?: "Something went wrong"
+                e.message ?: "Something wrong happened"
             )
         }
     }
@@ -50,6 +50,7 @@ class BookRepositoryImpl(
                 bookEntities.map { it.toBook() }
             }
     }
+
     override suspend fun markAsFavorite(book: Book): EmptyResult<DataError.Local> {
         return try {
             favoriteBookDao.upsert(book.toBookEntity())
@@ -66,8 +67,6 @@ class BookRepositoryImpl(
                 bookEntities.any { it.id == id }
             }
     }
-
-
 
     override suspend fun deleteFromFavorites(id: String) {
         favoriteBookDao.deleteFavoriteBook(id)
