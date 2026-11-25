@@ -4,6 +4,7 @@ package com.plcoding.bookpedia.books.data.database
 
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.plcoding.bookpedia.features.books.data.database.FavoriteBookDatabase
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager

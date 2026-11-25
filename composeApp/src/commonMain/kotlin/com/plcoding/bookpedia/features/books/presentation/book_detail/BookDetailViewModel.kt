@@ -1,53 +1,53 @@
 
 package com.plcoding.bookpedia.features.books.presentation.book_detail
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
-import com.plcoding.bookpedia.app.Route
+import com.plcoding.bookpedia.features.books.domain.models.Book
 import com.plcoding.bookpedia.features.books.domain.repositories.BookRepository
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class BookDetailViewModel(
-    private val bookRepository: BookRepository,
-    private val savedStateHandle: SavedStateHandle
+    private val bookRepository: BookRepository
 ) : ViewModel() {
-
-    private val bookId = savedStateHandle.toRoute<Route.BookDetail>().id
-
+    private var bookId: String? = null
     private val _state = MutableStateFlow(BookDetailState())
+    val state = _state.asStateFlow()
+    private val _selectedBook = MutableStateFlow<Book?>(null)
+    val selectedBook = _selectedBook.asStateFlow()
+    private var favoriteStatusJob: Job? = null
+    private var descriptionJob: Job? = null
 
-    val state = _state
-        .onStart {
-            fetchBookDescription()
-            observeFavoriteStatus()
+    fun onSelectBook(book: Book) {
+        bookId = book.id
+        _selectedBook.value = book
+        _state.update {
+            it.copy(
+                book = book,
+                isLoading = true,
+                isFavorite = false
+            )
         }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000L),
-            _state.value
-        )
+        favoriteStatusJob?.cancel()
+        descriptionJob?.cancel()
+        fetchBookDescription()
+        observeFavoriteStatus()
+    }
 
     fun onAction(action: BookDetailAction) {
         when (action) {
-            is BookDetailAction.OnSelectedBookChange -> {
-                _state.update {
-                    it.copy(book = action.book)
-                }
-            }
-
             is BookDetailAction.OnFavoriteClick -> {
                 viewModelScope.launch {
+                    val id = bookId ?: return@launch
                     if (state.value.isFavorite) {
-                        bookRepository.deleteFromFavorites(bookId)
+                        bookRepository.deleteFromFavorites(id)
                     } else {
                         state.value.book?.let { book ->
                             bookRepository.markAsFavorite(book)
@@ -61,30 +61,42 @@ class BookDetailViewModel(
     }
 
     private fun observeFavoriteStatus() {
-        bookRepository
-            .isBookFavorite(bookId)
+        val id = bookId ?: return
+
+        favoriteStatusJob = bookRepository
+            .isBookFavorite(id)
             .onEach { isFavorite ->
-                _state.update {
-                    it.copy(isFavorite = isFavorite)
+                if (bookId == id) {
+                    _state.update {
+                        it.copy(isFavorite = isFavorite)
+                    }
                 }
             }
             .launchIn(viewModelScope)
     }
 
     private fun fetchBookDescription() {
-        viewModelScope.launch {
-            try {
-                val description = bookRepository.getBookDescription(bookId)
+        val id = bookId ?: return
 
-                _state.update {
-                    it.copy(
-                        book = it.book?.copy(description = description),
-                        isLoading = false
-                    )
+        descriptionJob = viewModelScope.launch {
+            try {
+                val description = bookRepository.getBookDescription(id)
+
+                if (bookId == id) {
+                    _state.update {
+                        it.copy(
+                            book = it.book?.copy(description = description),
+                            isLoading = false
+                        )
+                    }
                 }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
-                _state.update {
-                    it.copy(isLoading = false)
+                if (bookId == id) {
+                    _state.update {
+                        it.copy(isLoading = false)
+                    }
                 }
             }
         }

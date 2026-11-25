@@ -1,23 +1,18 @@
 package com.plcoding.bookpedia.app
 
+import BookDetailScreenRoot
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import com.plcoding.bookpedia.features.books.presentation.SelectedBookViewModel
-import com.plcoding.bookpedia.features.books.presentation.book_detail.BookDetailAction
-import com.plcoding.bookpedia.features.books.presentation.book_detail.BookDetailScreenRoot
 import com.plcoding.bookpedia.features.books.presentation.book_detail.BookDetailViewModel
 import com.plcoding.bookpedia.features.books.presentation.book_list.BookListScreenRoot
 import com.plcoding.bookpedia.features.books.presentation.book_list.BookListViewModel
@@ -42,15 +37,14 @@ fun App() {
                     popEnterTransition = { slideInHorizontally() }
                 ) {
                     val viewModel = koinViewModel<BookListViewModel>()
-                    val selectedBookViewModel =
-                        it.sharedKoinViewModel<SelectedBookViewModel>(navController)
-                    LaunchedEffect(true) {
-                        selectedBookViewModel.onSelectBook(null)
-                    }
+                    val bookDetailViewModel =
+                        it.sharedKoinViewModel<BookDetailViewModel>(
+                            navController
+                        )
                     BookListScreenRoot(
                         viewModel = viewModel,
                         onBookClick = { book ->
-                            selectedBookViewModel.onSelectBook(book)
+                            bookDetailViewModel.onSelectBook(book)
                             navController.navigate(
                                 Route.BookDetail(book.id)
                             )
@@ -69,17 +63,10 @@ fun App() {
                         }
                     }
                 ) {
-                    val viewModel = koinViewModel<BookDetailViewModel>()
-                    val selectedBookViewModel =
-                        it.sharedKoinViewModel<SelectedBookViewModel>(navController)
-                    val selectedBook by selectedBookViewModel.selectedBook.collectAsStateWithLifecycle()
-                    LaunchedEffect(selectedBook) {
-                        selectedBook?.let { book ->
-                            viewModel.onAction(
-                                BookDetailAction.OnSelectedBookChange(book)
-                            )
-                        }
-                    }
+                    val viewModel =
+                        it.sharedKoinViewModel<BookDetailViewModel>(
+                            navController
+                        )
                     BookDetailScreenRoot(
                         viewModel = viewModel,
                         onBackClick = {
