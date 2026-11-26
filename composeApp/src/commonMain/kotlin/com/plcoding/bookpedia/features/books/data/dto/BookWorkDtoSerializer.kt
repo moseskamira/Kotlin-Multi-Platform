@@ -33,7 +33,7 @@ object BookWorkDtoSerializer: KSerializer<BookWorkDto> {
                     )
                     val element = jsonDecoder.decodeJsonElement()
                     description = if(element is JsonObject) {
-                        decoder.json.decodeFromJsonElement<DescriptionDto>(
+                        decoder.json.decodeFromJsonElement(
                             element = element,
                             deserializer = DescriptionDto.serializer()
                         ).value
@@ -45,7 +45,6 @@ object BookWorkDtoSerializer: KSerializer<BookWorkDto> {
                 else -> throw SerializationException("Unexpected index $index")
             }
         }
-
         return@decodeStructure BookWorkDto(description)
     }
 

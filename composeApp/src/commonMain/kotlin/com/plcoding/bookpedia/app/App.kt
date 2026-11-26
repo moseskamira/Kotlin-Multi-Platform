@@ -5,6 +5,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
@@ -41,6 +42,9 @@ fun App() {
                         it.sharedKoinViewModel<BookDetailViewModel>(
                             navController
                         )
+                    LaunchedEffect(true){
+                        bookDetailViewModel.onSelectBook(null)
+                    }
                     BookListScreenRoot(
                         viewModel = viewModel,
                         onBookClick = { book ->

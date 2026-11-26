@@ -52,7 +52,9 @@ fun BookListScreen(
     errorMessage: String?,
     searchQuery: String,
     selectedTabIndex: Int,
-    onAction: (BookListAction) -> Unit
+    onSearch: (String) -> Unit,
+    onTabChanged: (Int) -> Unit,
+    onBookClicked: (Book) -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val pagerState = rememberPagerState { 2 }
@@ -69,7 +71,7 @@ fun BookListScreen(
     }
 
     LaunchedEffect(pagerState.currentPage) {
-        onAction(BookListAction.OnTabSelected(pagerState.currentPage))
+        onTabChanged(pagerState.currentPage)
     }
 
     Box(
@@ -86,7 +88,7 @@ fun BookListScreen(
             BookSearchBar(
                 searchQuery = searchQuery,
                 onSearchQueryChange = {
-                    onAction(BookListAction.OnSearchQueryChange(it))
+                    onSearch(it)
                 },
                 onImeSearch = {
                     keyboardController?.hide()
@@ -128,7 +130,7 @@ fun BookListScreen(
                         Tab(
                             selected = selectedTabIndex == 0,
                             onClick = {
-                                onAction(BookListAction.OnTabSelected(0))
+                                onTabChanged(0)
                             },
                             modifier = Modifier.weight(1f),
                             selectedContentColor = SandYellow,
@@ -143,7 +145,7 @@ fun BookListScreen(
                         Tab(
                             selected = selectedTabIndex == 1,
                             onClick = {
-                                onAction(BookListAction.OnTabSelected(1))
+                                onTabChanged(1)
                             },
                             modifier = Modifier.weight(1f),
                             selectedContentColor = SandYellow,
@@ -201,9 +203,7 @@ fun BookListScreen(
                                             BookList(
                                                 books = books,
                                                 onBookClick = {
-                                                    onAction(
-                                                        BookListAction.OnBookClick(it)
-                                                    )
+                                                    onBookClicked(it)
                                                 },
                                                 modifier = Modifier.fillMaxSize(),
                                                 scrollState = searchResultsListState
@@ -226,9 +226,7 @@ fun BookListScreen(
                                         BookList(
                                             books = favoriteBooks,
                                             onBookClick = {
-                                                onAction(
-                                                    BookListAction.OnBookClick(it)
-                                                )
+                                                onBookClicked(it)
                                             },
                                             modifier = Modifier.fillMaxSize(),
                                             scrollState = favoriteBooksListState

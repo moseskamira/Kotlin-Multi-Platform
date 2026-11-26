@@ -24,12 +24,15 @@ fun BookListScreenRoot(
         errorMessage = errorMessage,
         searchQuery = searchQuery,
         selectedTabIndex = selectedTabIndex,
-        onAction = { action ->
-            when (action) {
-                is BookListAction.OnBookClick -> onBookClick(action.book)
-                else -> Unit
-            }
-            viewModel.onAction(action)
+        onBookClicked = {
+            onBookClick(it)
+        },
+        onSearch = {
+            viewModel.updateSearchQuery(it)
+        },
+        onTabChanged = {
+            viewModel.updateTabIndex(it)
         }
+
     )
 }
