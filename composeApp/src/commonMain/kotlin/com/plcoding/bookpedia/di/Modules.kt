@@ -14,7 +14,6 @@ import com.plcoding.bookpedia.features.books.data.network.RemoteBookDataSourceIm
 import com.plcoding.bookpedia.features.books.data.repository.BookRepositoryImpl
 import com.plcoding.bookpedia.features.books.domain.repositories.BookRepository
 
-import com.plcoding.bookpedia.features.books.presentation.SelectedBookViewModel
 import com.plcoding.bookpedia.features.books.presentation.book_list.BookListViewModel
 import com.plcoding.bookpedia.features.books.presentation.book_detail.BookDetailViewModel
 
@@ -50,5 +49,4 @@ val sharedModule = module {
     }
     viewModelOf(::BookListViewModel)
     viewModelOf(::BookDetailViewModel)
-    viewModelOf(::SelectedBookViewModel)
 }
