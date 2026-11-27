@@ -1,4 +1,3 @@
-
 package com.plcoding.bookpedia.features.books.presentation.book_detail
 
 import androidx.lifecycle.ViewModel
@@ -18,36 +17,35 @@ class BookDetailViewModel(
     private val bookRepository: BookRepository
 ) : ViewModel() {
     private var bookId: String? = null
-    private val _state = MutableStateFlow(BookDetailState())
-    val state = _state.asStateFlow()
     private val _selectedBook = MutableStateFlow<Book?>(null)
+    private val _bookToFavorite = MutableStateFlow<Book?>(null)
+    private val _isLoading = MutableStateFlow(true)
+    private val _isFavorite = MutableStateFlow(false)
     val selectedBook = _selectedBook.asStateFlow()
+    val isLoading = _isLoading.asStateFlow()
+    val isFavorite = _isFavorite.asStateFlow()
+
     private var favoriteStatusJob: Job? = null
     private var descriptionJob: Job? = null
 
     fun onSelectBook(book: Book?) {
         bookId = book?.id
         _selectedBook.value = book
-        _state.update {
-            it.copy(
-                book = book,
-                isLoading = true,
-                isFavorite = false
-            )
-        }
+        _isLoading.value = true;
         favoriteStatusJob?.cancel()
         descriptionJob?.cancel()
         fetchBookDescription()
         observeFavoriteStatus()
     }
 
-    fun onFavoriteClick(){
+    fun onFavoriteClick(book: Book) {
         viewModelScope.launch {
+            _bookToFavorite.value = book
             val id = bookId ?: return@launch
-            if (state.value.isFavorite) {
+            if (isFavorite.value) {
                 bookRepository.deleteFromFavorites(id)
             } else {
-                state.value.book?.let { book ->
+                _bookToFavorite.value?.let { book ->
                     bookRepository.markAsFavorite(book)
                 }
             }
@@ -61,9 +59,7 @@ class BookDetailViewModel(
             .isBookFavorite(id)
             .onEach { isFavorite ->
                 if (bookId == id) {
-                    _state.update {
-                        it.copy(isFavorite = isFavorite)
-                    }
+                    _isFavorite.value = isFavorite
                 }
             }
             .launchIn(viewModelScope)
@@ -74,12 +70,11 @@ class BookDetailViewModel(
         descriptionJob = viewModelScope.launch {
             try {
                 val description = bookRepository.getBookDescription(id)
-
                 if (bookId == id) {
-                    _state.update {
-                        it.copy(
-                            book = it.book?.copy(description = description),
-                            isLoading = false
+                    _isLoading.value = false
+                    _bookToFavorite.update { book ->
+                        book?.copy(
+                            description = description
                         )
                     }
                 }
@@ -87,9 +82,7 @@ class BookDetailViewModel(
                 throw e
             } catch (e: Exception) {
                 if (bookId == id) {
-                    _state.update {
-                        it.copy(isLoading = false)
-                    }
+                    _isLoading.value = false;
                 }
             }
         }

@@ -43,14 +43,15 @@ import kotlin.math.round
 
 @Composable
 fun BookDetailScreen(
-    state: BookDetailState,
     onBackClick: () -> Unit,
     onFavoriteClick: () -> Unit,
-    book: Book?
+    book: Book?,
+    isLoading: Boolean,
+    isFavorite: Boolean
 ) {
     BlurredImageBackground(
         imageUrl = book?.imageUrl,
-        isFavorite = state.isFavorite,
+        isFavorite = isFavorite,
         onFavoriteClick = onFavoriteClick,
         onBackClick = onBackClick,
         modifier = Modifier.fillMaxSize()
@@ -58,7 +59,7 @@ fun BookDetailScreen(
         book?.let {
             BookDetailContent(
                 book = it,
-                state = state
+                isLoading= isLoading
             )
         }
     }
@@ -67,7 +68,7 @@ fun BookDetailScreen(
 @Composable
 private fun BookDetailContent(
     book: Book,
-    state: BookDetailState
+    isLoading: Boolean
 ) {
     Column(
         modifier = Modifier
@@ -82,7 +83,7 @@ private fun BookDetailContent(
         BookLanguages(languages = book.languages)
         SynopsisSection(
             description = book.description,
-            isLoading = state.isLoading
+            isLoading = isLoading
         )
     }
 }
