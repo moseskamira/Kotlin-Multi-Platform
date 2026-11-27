@@ -69,11 +69,9 @@ class BookListViewModel(
                             _errorMessage.value = null
                             _books.value = cachedBooks
                         }
-
                         query.length >= 2 -> {
                             searchBooks(query)
                         }
-
                         else -> {
                             _isLoading.value = false
                             _errorMessage.value = null

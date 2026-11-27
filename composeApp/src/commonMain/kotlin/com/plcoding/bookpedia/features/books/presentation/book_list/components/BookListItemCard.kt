@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarHalf
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -159,9 +160,18 @@ fun BookListItemCard(
                             text = "${round(rating * 10) / 10.0}",
                             style = MaterialTheme.typography.bodyMedium
                         )
-                        repeat(rating.toInt()) {
+                        val fullStars = rating.toInt()
+                        val hasHalfStar = (rating - fullStars) >= 0.5
+                        repeat(fullStars) {
                             Icon(
                                 imageVector = Icons.Default.Star,
+                                contentDescription = null,
+                                tint = SandYellow
+                            )
+                        }
+                        if (hasHalfStar) {
+                            Icon(
+                                imageVector = Icons.Default.StarHalf,
                                 contentDescription = null,
                                 tint = SandYellow
                             )
