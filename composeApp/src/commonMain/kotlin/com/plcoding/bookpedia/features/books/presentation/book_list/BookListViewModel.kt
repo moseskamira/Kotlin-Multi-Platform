@@ -35,21 +35,12 @@ class BookListViewModel(
         observeFavoriteBooks()
         observeSearchQuery()
     }
+    fun updateSearchQuery(query: String){
+        _searchQuery.value = query
+    }
 
-    fun onAction(action: BookListAction) {
-        when (action) {
-            is BookListAction.OnBookClick -> {
-                // Handle navigation
-            }
-
-            is BookListAction.OnSearchQueryChange -> {
-                _searchQuery.value = action.query
-            }
-
-            is BookListAction.OnTabSelected -> {
-                _selectedTabIndex.value = action.index
-            }
-        }
+    fun updateTabIndex(index: Int){
+        _selectedTabIndex.value = index
     }
 
     private fun observeFavoriteBooks() {
@@ -101,6 +92,7 @@ class BookListViewModel(
                 cachedBooks = response.data
                 _books.value = response.data
             }
+
             is AppNetworkResponse.Error -> {
                 _errorMessage.value = response.message
                 _books.value = cachedBooks

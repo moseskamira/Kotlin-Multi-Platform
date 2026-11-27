@@ -25,8 +25,8 @@ class BookDetailViewModel(
     private var favoriteStatusJob: Job? = null
     private var descriptionJob: Job? = null
 
-    fun onSelectBook(book: Book) {
-        bookId = book.id
+    fun onSelectBook(book: Book?) {
+        bookId = book?.id
         _selectedBook.value = book
         _state.update {
             it.copy(

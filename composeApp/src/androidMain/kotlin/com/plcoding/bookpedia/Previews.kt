@@ -54,6 +54,8 @@ private fun BookListScreenPreview() {
         errorMessage = null,
         searchQuery = "",
         selectedTabIndex = 0,
-        onAction = {}
+        onSearch = {},
+        onTabChanged = {},
+        onBookClicked = {}
     )
 }
