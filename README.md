@@ -26,10 +26,6 @@ Contains the shared application code for Compose Multiplatform.
 - `iosMain`: iOS-specific implementations and native integrations.
 - `desktopMain`: Desktop-specific implementations.
 
-### `/iosApp`
-
-Contains the native iOS application entry point. It integrates the shared Compose Multiplatform application with the iOS platform and provides a location for platform-specific SwiftUI code where needed.
-
 ## Project Goals
 
 - Gain practical experience with Kotlin Multiplatform development.

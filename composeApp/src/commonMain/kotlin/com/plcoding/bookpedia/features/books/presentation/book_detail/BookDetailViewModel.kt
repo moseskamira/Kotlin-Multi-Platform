@@ -41,28 +41,22 @@ class BookDetailViewModel(
         observeFavoriteStatus()
     }
 
-    fun onAction(action: BookDetailAction) {
-        when (action) {
-            is BookDetailAction.OnFavoriteClick -> {
-                viewModelScope.launch {
-                    val id = bookId ?: return@launch
-                    if (state.value.isFavorite) {
-                        bookRepository.deleteFromFavorites(id)
-                    } else {
-                        state.value.book?.let { book ->
-                            bookRepository.markAsFavorite(book)
-                        }
-                    }
+    fun onFavoriteClick(){
+        viewModelScope.launch {
+            val id = bookId ?: return@launch
+            if (state.value.isFavorite) {
+                bookRepository.deleteFromFavorites(id)
+            } else {
+                state.value.book?.let { book ->
+                    bookRepository.markAsFavorite(book)
                 }
             }
-
-            else -> Unit
         }
+
     }
 
     private fun observeFavoriteStatus() {
         val id = bookId ?: return
-
         favoriteStatusJob = bookRepository
             .isBookFavorite(id)
             .onEach { isFavorite ->
@@ -77,7 +71,6 @@ class BookDetailViewModel(
 
     private fun fetchBookDescription() {
         val id = bookId ?: return
-
         descriptionJob = viewModelScope.launch {
             try {
                 val description = bookRepository.getBookDescription(id)

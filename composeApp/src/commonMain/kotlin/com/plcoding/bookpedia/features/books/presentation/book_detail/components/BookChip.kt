@@ -1,6 +1,5 @@
 package com.plcoding.bookpedia.features.books.presentation.book_detail.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -13,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.plcoding.bookpedia.core.presentation.LightBlue
 
 enum class ChipSize {
     SMALL, REGULAR
@@ -34,7 +32,6 @@ fun BookChip(
                 }
             )
             .clip(RoundedCornerShape(16.dp))
-            .background(LightBlue)
             .padding(
                 vertical = 8.dp,
                 horizontal = 12.dp
