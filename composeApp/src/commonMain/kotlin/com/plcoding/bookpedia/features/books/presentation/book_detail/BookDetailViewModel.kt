@@ -19,22 +19,26 @@ class BookDetailViewModel(
     private var bookId: String? = null
     private val _selectedBook = MutableStateFlow<Book?>(null)
     private val _bookToFavorite = MutableStateFlow<Book?>(null)
-    private val _isLoading = MutableStateFlow(true)
+    private val _isLoadingDescription = MutableStateFlow(true)
     private val _isFavorite = MutableStateFlow(false)
     val selectedBook = _selectedBook.asStateFlow()
-    val isLoading = _isLoading.asStateFlow()
+    val isLoadingDescription = _isLoadingDescription.asStateFlow()
     val isFavorite = _isFavorite.asStateFlow()
-
     private var favoriteStatusJob: Job? = null
     private var descriptionJob: Job? = null
 
     fun onSelectBook(book: Book?) {
         bookId = book?.id
         _selectedBook.value = book
-        _isLoading.value = true;
+        _isLoadingDescription.value = true;
         favoriteStatusJob?.cancel()
         descriptionJob?.cancel()
-        fetchBookDescription()
+        if (book?.description.isNullOrBlank()) {
+            _isLoadingDescription.value = true
+            fetchBookDescription()
+        } else {
+            _isLoadingDescription.value = false
+        }
         observeFavoriteStatus()
     }
 
@@ -71,8 +75,8 @@ class BookDetailViewModel(
             try {
                 val description = bookRepository.getBookDescription(id)
                 if (bookId == id) {
-                    _isLoading.value = false
-                    _bookToFavorite.update { book ->
+                    _isLoadingDescription.value = false
+                    _selectedBook.update { book ->
                         book?.copy(
                             description = description
                         )
@@ -82,7 +86,7 @@ class BookDetailViewModel(
                 throw e
             } catch (e: Exception) {
                 if (bookId == id) {
-                    _isLoading.value = false;
+                    _isLoadingDescription.value = false;
                 }
             }
         }

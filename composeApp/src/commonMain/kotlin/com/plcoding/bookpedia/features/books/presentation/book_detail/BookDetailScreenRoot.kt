@@ -11,7 +11,7 @@ fun BookDetailScreenRoot(
     onBackClick: () -> Unit
 ) {
     val selectedBook by viewModel.selectedBook.collectAsStateWithLifecycle()
-    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoadingDescription.collectAsStateWithLifecycle()
     val isFavorite by viewModel.isFavorite.collectAsStateWithLifecycle()
     BookDetailScreen(
         book = selectedBook,
